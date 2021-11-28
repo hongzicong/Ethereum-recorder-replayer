@@ -71,6 +71,8 @@ func ApplySubstate(ctx *cli.Context, block uint64, tx int, substate *research.Su
 		return nil, nil
 	}
 
+	// Capture errors for BLOCKHASH operation, if we haven't been supplied the
+	// required blockhashes
 	var hashError error
 	getHash := func(num uint64) common.Hash {
 		if pre.Env.BlockHashes == nil {
@@ -91,7 +93,6 @@ func ApplySubstate(ctx *cli.Context, block uint64, tx int, substate *research.Su
 		blockHash = common.Hash{0x13, 0x37}
 		txIndex   = tx
 	)
-
 	gaspool.AddGas(pre.Env.GasLimit)
 	vmContext := vm.BlockContext{
 		CanTransfer: core.CanTransfer,
