@@ -160,11 +160,22 @@ func (evm *EVM) Interpreter() *EVMInterpreter {
 	return evm.interpreter
 }
 
+//func ContractPos(addr common.Address) uint64 {
+//	num := new(big.Int)
+//	num.SetString(addr.Hex()[2:], 16)
+//	return num.Uint64() % 32
+//}
+
 // Call executes the contract associated with the addr with the given input as
 // parameters. It also handles any necessary value transfer required and takes
 // the necessary steps to create accounts and reverses the state in case of an
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
+	//if ContractPos(caller.Address()) != ContractPos(addr) {
+	//	// 20 Mbps = 20,000,000 bits per second
+	//	time.Sleep(time.Millisecond * 100 * 2 + time.Microsecond * time.Duration(2 * 1000000 * len(input) * 8 / 20000000))
+	//}
+
 	if evm.Config.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}

@@ -340,7 +340,7 @@ func TransitionSubstate(ctx *cli.Context) error {
 
 		case int64:
 			block := data.(int64)
-			if block%10000 == 0 {
+			if block%10 == 0 {
 				duration := time.Since(start) + 1*time.Nanosecond
 				sec := duration.Seconds()
 
