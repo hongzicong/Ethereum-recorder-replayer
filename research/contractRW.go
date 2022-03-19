@@ -31,7 +31,7 @@ func OpenContractRWDB() {
 
 	for name := range dbNameMap {
 		var db *leveldb.DB
-		path = filepath.Join(substateDir, name)
+		path = filepath.Join(contractRWDir, name)
 		db, err = leveldb.OpenFile(path, &opt)
 		if _, corrupted := err.(*leveldb_errors.ErrCorrupted); corrupted {
 			db, err = leveldb.RecoverFile(path, &opt)
