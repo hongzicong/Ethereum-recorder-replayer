@@ -118,6 +118,8 @@ func ApplySubstate(ctx *cli.Context, block uint64, tx int, substate *research.Su
 	//vmContext.GasPrice = msg.GasPrice()
 	//vmContext.Origin = msg.From()
 	txContext := core.NewEVMTxContext(msg)
+	txContext.BlockIndex = block
+	txContext.TxIndex = uint64(txIndex)
 	snapshot := statedb.Snapshot()
 	evm := vm.NewEVM(vmContext, txContext, statedb, chainConfig, vmConfig)
 
@@ -249,6 +251,9 @@ func TransitionSubstate(ctx *cli.Context) error {
 
 	research.OpenSubstateDBReadOnly()
 	defer research.CloseSubstateDB()
+
+	research.OpenContractRWDB()
+	defer research.CloseContractRWDB()
 
 	var totalNumBlock, totalNumTx int64
 	defer func() {

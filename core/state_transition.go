@@ -18,6 +18,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/ethereum/go-ethereum/research"
 	"math"
 	"math/big"
 
@@ -322,6 +323,9 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	} else {
 		// Increment the nonce for the next transaction
 		st.state.SetNonce(msg.From(), st.state.GetNonce(sender.Address())+1)
+
+		// collect rw set
+		research.PutRWSet(st.evm.BlockIndex, st.evm.TxIndex, []byte("call"+"-"+st.to().Hex()))
 		ret, st.gas, vmerr = st.evm.Call(sender, st.to(), st.data, st.gas, st.value)
 	}
 

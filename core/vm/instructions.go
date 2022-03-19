@@ -20,6 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/research"
 	"github.com/holiman/uint256"
 	"golang.org/x/crypto/sha3"
 
@@ -522,6 +523,8 @@ func opSload(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]by
 	hash := common.Hash(loc.Bytes32())
 	val := interpreter.evm.StateDB.GetState(scope.Contract.Address(), hash)
 	loc.SetBytes(val.Bytes())
+	// collect rw set
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("sload"+"-"+scope.Contract.Address().Hex()+":"+loc.Hex()))
 	return nil, nil
 }
 
@@ -530,6 +533,8 @@ func opSstore(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]b
 	val := scope.Stack.pop()
 	interpreter.evm.StateDB.SetState(scope.Contract.Address(),
 		loc.Bytes32(), val.Bytes32())
+	// collect rw set
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("sstore"+"-"+scope.Contract.Address().Hex()+":"+loc.Hex()))
 	return nil, nil
 }
 
@@ -672,6 +677,8 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byt
 		bigVal = value.ToBig()
 	}
 
+	// collect rw set
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("call"+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.Call(scope.Contract, toAddr, args, gas, bigVal)
 
 	if err != nil {
@@ -708,6 +715,8 @@ func opCallCode(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([
 		bigVal = value.ToBig()
 	}
 
+	// collect rw set
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("callcode"+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.CallCode(scope.Contract, toAddr, args, gas, bigVal)
 	if err != nil {
 		temp.Clear()
@@ -736,6 +745,8 @@ func opDelegateCall(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext
 	// Get arguments from the memory.
 	args := scope.Memory.GetPtr(int64(inOffset.Uint64()), int64(inSize.Uint64()))
 
+	// collect rw set
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("delegatecaLL"+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.DelegateCall(scope.Contract, toAddr, args, gas)
 	if err != nil {
 		temp.Clear()
@@ -764,6 +775,8 @@ func opStaticCall(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) 
 	// Get arguments from the memory.
 	args := scope.Memory.GetPtr(int64(inOffset.Uint64()), int64(inSize.Uint64()))
 
+	// collect rw set
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("staticcall"+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.StaticCall(scope.Contract, toAddr, args, gas)
 	if err != nil {
 		temp.Clear()
