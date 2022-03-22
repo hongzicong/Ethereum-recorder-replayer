@@ -678,7 +678,7 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byt
 	}
 
 	// collect rw set
-	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("call"+"-"+toAddr.Hex()))
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("call"+"-"+scope.Contract.Address().Hex()+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.Call(scope.Contract, toAddr, args, gas, bigVal)
 
 	if err != nil {
@@ -716,7 +716,7 @@ func opCallCode(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([
 	}
 
 	// collect rw set
-	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("callcode"+"-"+toAddr.Hex()))
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("callcode"+"-"+scope.Contract.Address().Hex()+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.CallCode(scope.Contract, toAddr, args, gas, bigVal)
 	if err != nil {
 		temp.Clear()
@@ -746,7 +746,7 @@ func opDelegateCall(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext
 	args := scope.Memory.GetPtr(int64(inOffset.Uint64()), int64(inSize.Uint64()))
 
 	// collect rw set
-	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("delegatecaLL"+"-"+toAddr.Hex()))
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("delegatecaLL"+"-"+scope.Contract.Address().Hex()+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.DelegateCall(scope.Contract, toAddr, args, gas)
 	if err != nil {
 		temp.Clear()
@@ -776,7 +776,7 @@ func opStaticCall(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) 
 	args := scope.Memory.GetPtr(int64(inOffset.Uint64()), int64(inSize.Uint64()))
 
 	// collect rw set
-	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("staticcall"+"-"+toAddr.Hex()))
+	research.PutRWSet(interpreter.evm.BlockIndex, interpreter.evm.TxIndex, []byte("staticcall"+"-"+scope.Contract.Address().Hex()+"-"+toAddr.Hex()))
 	ret, returnGas, err := interpreter.evm.StaticCall(scope.Contract, toAddr, args, gas)
 	if err != nil {
 		temp.Clear()

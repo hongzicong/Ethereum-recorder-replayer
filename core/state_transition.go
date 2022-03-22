@@ -325,7 +325,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		st.state.SetNonce(msg.From(), st.state.GetNonce(sender.Address())+1)
 
 		// collect rw set
-		research.PutRWSet(st.evm.BlockIndex, st.evm.TxIndex, []byte("call"+"-"+st.to().Hex()))
+		research.PutRWSet(st.evm.BlockIndex, st.evm.TxIndex, []byte("call"+"-"+sender.Address().Hex()+"-"+st.to().Hex()))
 		ret, st.gas, vmerr = st.evm.Call(sender, st.to(), st.data, st.gas, st.value)
 	}
 
