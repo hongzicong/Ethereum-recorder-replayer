@@ -17,6 +17,7 @@
 package vm
 
 import (
+	"fmt"
 	"math/big"
 	"sync/atomic"
 	"time"
@@ -174,7 +175,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// Simulate the cross-shard latency
 	if ContractPos(caller.Address()) != ContractPos(addr) {
 		// 20 Mbps = 20,000,000 bits per second
-		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
+		latency := time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000)
+		fmt.Printf("Detail report: %v %v\n", latency, len(input))
+		time.Sleep(latency)
 	}
 
 	if evm.Config.NoRecursion && evm.depth > 0 {
@@ -269,7 +272,9 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 	// Simulate the cross-shard latency
 	if ContractPos(caller.Address()) != ContractPos(addr) {
 		// 20 Mbps = 20,000,000 bits per second
-		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
+		latency := time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000)
+		fmt.Printf("Detail report: %v %v\n", latency, len(input))
+		time.Sleep(latency)
 	}
 
 	if evm.Config.NoRecursion && evm.depth > 0 {
@@ -326,7 +331,9 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	// Simulate the cross-shard latency
 	if ContractPos(caller.Address()) != ContractPos(addr) {
 		// 20 Mbps = 20,000,000 bits per second
-		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
+		latency := time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000)
+		fmt.Printf("Detail report: %v %v\n", latency, len(input))
+		time.Sleep(latency)
 	}
 
 	if evm.Config.NoRecursion && evm.depth > 0 {
@@ -374,7 +381,9 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 	// Simulate the cross-shard latency
 	if ContractPos(caller.Address()) != ContractPos(addr) {
 		// 20 Mbps = 20,000,000 bits per second
-		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
+		latency := time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000)
+		fmt.Printf("Detail report: %v %v\n", latency, len(input))
+		time.Sleep(latency)
 	}
 
 	if evm.Config.NoRecursion && evm.depth > 0 {
