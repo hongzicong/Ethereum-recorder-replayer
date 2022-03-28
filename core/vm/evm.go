@@ -171,6 +171,7 @@ func ContractPos(addr common.Address) uint64 {
 // the necessary steps to create accounts and reverses the state in case of an
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
+	// Simulate the cross-shard latency
 	if ContractPos(caller.Address()) != ContractPos(addr) {
 		// 20 Mbps = 20,000,000 bits per second
 		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
@@ -265,6 +266,12 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 // CallCode differs from Call in the sense that it executes the given address'
 // code with the caller as context.
 func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
+	// Simulate the cross-shard latency
+	if ContractPos(caller.Address()) != ContractPos(addr) {
+		// 20 Mbps = 20,000,000 bits per second
+		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
+	}
+
 	if evm.Config.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}
@@ -316,6 +323,12 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 // DelegateCall differs from CallCode in the sense that it executes the given address'
 // code with the caller as context and the caller is set to the caller of the caller.
 func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []byte, gas uint64) (ret []byte, leftOverGas uint64, err error) {
+	// Simulate the cross-shard latency
+	if ContractPos(caller.Address()) != ContractPos(addr) {
+		// 20 Mbps = 20,000,000 bits per second
+		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
+	}
+
 	if evm.Config.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}
@@ -358,6 +371,12 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 // Opcodes that attempt to perform such modifications will result in exceptions
 // instead of performing the modifications.
 func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte, gas uint64) (ret []byte, leftOverGas uint64, err error) {
+	// Simulate the cross-shard latency
+	if ContractPos(caller.Address()) != ContractPos(addr) {
+		// 20 Mbps = 20,000,000 bits per second
+		time.Sleep(time.Millisecond*100*2 + time.Microsecond*time.Duration(2*1000000*len(input)*8/20000000))
+	}
+
 	if evm.Config.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}
