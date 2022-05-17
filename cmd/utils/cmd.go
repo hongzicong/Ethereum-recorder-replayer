@@ -162,7 +162,18 @@ func ImportChain(chain *core.BlockChain, fn string) error {
 	// Run actual the import.
 	blocks := make(types.Blocks, importBatchSize)
 	n := 0
+
+	lastSec := time.Now()
+	totalNumBlock, totalNumTx := 0, 0
 	for batch := 0; ; batch++ {
+		duration := time.Since(lastSec) + 1*time.Nanosecond
+		sec := duration.Seconds()
+		blkPerSec := float64(totalNumBlock) / sec
+		txPerSec := float64(totalNumTx) / sec
+		lastSec = time.Now()
+		totalNumBlock, totalNumTx = 0, 0
+		fmt.Printf("report: %d %.2f blk/s, %.2f tx/s\n", batch*importBatchSize, blkPerSec, txPerSec)
+
 		// Load a batch of RLP blocks.
 		if checkInterrupt() {
 			return fmt.Errorf("interrupted")
@@ -181,6 +192,8 @@ func ImportChain(chain *core.BlockChain, fn string) error {
 				continue
 			}
 			blocks[i] = &b
+			totalNumBlock += 1
+			totalNumTx += len(blocks[i].Transactions())
 			n++
 		}
 		if i == 0 {
