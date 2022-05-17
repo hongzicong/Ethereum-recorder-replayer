@@ -239,8 +239,6 @@ func init() {
 		utils.ShowDeprecated,
 		// See snapshot.go
 		snapshotCommand,
-		// stage1-substate: export-substate command
-		exportSubstateCommand,
 	}
 	sort.Sort(cli.CommandsByName(app.Commands))
 
