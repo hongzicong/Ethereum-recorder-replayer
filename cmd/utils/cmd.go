@@ -172,7 +172,12 @@ func ImportChain(chain *core.BlockChain, fn string) error {
 		txPerSec := float64(totalNumTx) / sec
 		lastSec = time.Now()
 		totalNumBlock, totalNumTx = 0, 0
-		fmt.Printf("report: %d %.2f blk/s, %.2f tx/s\n", batch*importBatchSize, blkPerSec, txPerSec)
+		fmt.Printf("report: %d %.2f blk/s, %.2f tx/s, %v readState,"+
+			" %v writeState, %v readSizeState, %v writeSizeState,"+
+			" %v readTxn, %v writeTxn, %v readSizeTxn, %v writeSizeTxn\n",
+			batch*importBatchSize, blkPerSec, txPerSec, rawdb.StateRCounter.Count(), rawdb.StateWCounter.Count(),
+			rawdb.StateSizeRCounter.Count(), rawdb.StateSizeWCounter.Count(), rawdb.TxnRCounter.Count(),
+			rawdb.TxnWCounter.Count(), rawdb.TxnSizeRCounter.Count(), rawdb.TxnSizeWCounter.Count())
 
 		// Load a batch of RLP blocks.
 		if checkInterrupt() {

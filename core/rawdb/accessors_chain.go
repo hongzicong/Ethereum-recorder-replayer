@@ -21,6 +21,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/metrics"
 	"math/big"
 	"sort"
 
@@ -31,6 +32,13 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
+)
+
+var (
+	TxnRCounter     = metrics.NewRegisteredCounter("txn/read", nil)
+	TxnSizeRCounter = metrics.NewRegisteredCounter("txnsize/read", nil)
+	TxnWCounter     = metrics.NewRegisteredCounter("txn/write", nil)
+	TxnSizeWCounter = metrics.NewRegisteredCounter("txnsize/write", nil)
 )
 
 // ReadCanonicalHash retrieves the hash assigned to a canonical block number.
@@ -312,6 +320,8 @@ func ReadHeaderRLP(db ethdb.Reader, hash common.Hash, number uint64) rlp.RawValu
 		data, _ = db.Get(headerKey(number, hash))
 		return nil
 	})
+	TxnRCounter.Inc(1)
+	TxnSizeRCounter.Inc(int64(len(data)))
 	return data
 }
 
@@ -359,6 +369,8 @@ func WriteHeader(db ethdb.KeyValueWriter, header *types.Header) {
 	if err := db.Put(key, data); err != nil {
 		log.Crit("Failed to store header", "err", err)
 	}
+	TxnWCounter.Inc(1)
+	TxnSizeWCounter.Inc(int64(len(data)))
 }
 
 // DeleteHeader removes all block header data associated with a hash.
@@ -403,6 +415,8 @@ func ReadBodyRLP(db ethdb.Reader, hash common.Hash, number uint64) rlp.RawValue 
 		data, _ = db.Get(blockBodyKey(number, hash))
 		return nil
 	})
+	TxnRCounter.Inc(1)
+	TxnSizeRCounter.Inc(int64(len(data)))
 	return data
 }
 
@@ -419,6 +433,8 @@ func ReadCanonicalBodyRLP(db ethdb.Reader, number uint64) rlp.RawValue {
 		data, _ = db.Get(blockBodyKey(number, ReadCanonicalHash(db, number)))
 		return nil
 	})
+	TxnRCounter.Inc(1)
+	TxnSizeRCounter.Inc(int64(len(data)))
 	return data
 }
 
@@ -427,6 +443,8 @@ func WriteBodyRLP(db ethdb.KeyValueWriter, hash common.Hash, number uint64, rlp 
 	if err := db.Put(blockBodyKey(number, hash), rlp); err != nil {
 		log.Crit("Failed to store block body", "err", err)
 	}
+	TxnWCounter.Inc(1)
+	TxnSizeWCounter.Inc(int64(len(rlp)))
 }
 
 // HasBody verifies the existence of a block body corresponding to the hash.
