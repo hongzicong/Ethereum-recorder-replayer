@@ -27,6 +27,7 @@ import (
 	"os/signal"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -175,9 +176,9 @@ func ImportChain(chain *core.BlockChain, fn string) error {
 		fmt.Printf("report: %d %.2f blk/s, %.2f tx/s, %v readState,"+
 			" %v writeState, %v readSizeState, %v writeSizeState,"+
 			" %v readTxn, %v writeTxn, %v readSizeTxn, %v writeSizeTxn\n",
-			batch*importBatchSize, blkPerSec, txPerSec, rawdb.StateRCounter.Count(), rawdb.StateWCounter.Count(),
-			rawdb.StateSizeRCounter.Count(), rawdb.StateSizeWCounter.Count(), rawdb.TxnRCounter.Count(),
-			rawdb.TxnWCounter.Count(), rawdb.TxnSizeRCounter.Count(), rawdb.TxnSizeWCounter.Count())
+			batch*importBatchSize, blkPerSec, txPerSec, atomic.LoadUint64(&rawdb.StateRCounter), atomic.LoadUint64(&rawdb.StateWCounter),
+			atomic.LoadUint64(&rawdb.StateSizeRCounter), atomic.LoadUint64(&rawdb.StateSizeWCounter), atomic.LoadUint64(&rawdb.TxnRCounter),
+			atomic.LoadUint64(&rawdb.TxnWCounter), atomic.LoadUint64(&rawdb.TxnSizeRCounter), atomic.LoadUint64(&rawdb.TxnSizeWCounter))
 
 		// Load a batch of RLP blocks.
 		if checkInterrupt() {

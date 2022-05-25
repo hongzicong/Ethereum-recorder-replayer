@@ -20,14 +20,14 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
+	"sync/atomic"
 )
 
 var (
-	StateRCounter     = metrics.NewRegisteredCounter("state/read", nil)
-	StateSizeRCounter = metrics.NewRegisteredCounter("statesize/read", nil)
-	StateWCounter     = metrics.NewRegisteredCounter("state/write", nil)
-	StateSizeWCounter = metrics.NewRegisteredCounter("statesize/write", nil)
+	StateRCounter     uint64
+	StateSizeRCounter uint64
+	StateWCounter     uint64
+	StateSizeWCounter uint64
 )
 
 // ReadPreimage retrieves a single preimage of the provided hash.
@@ -66,8 +66,8 @@ func ReadCode(db ethdb.KeyValueReader, hash common.Hash) []byte {
 // will only check the existence with latest scheme(with prefix).
 func ReadCodeWithPrefix(db ethdb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(codeKey(hash))
-	StateRCounter.Inc(1)
-	StateSizeRCounter.Inc(int64(len(data)))
+	atomic.AddUint64(&StateRCounter, 1)
+	atomic.AddUint64(&StateSizeRCounter, uint64(len(data)))
 	return data
 }
 
@@ -76,8 +76,8 @@ func WriteCode(db ethdb.KeyValueWriter, hash common.Hash, code []byte) {
 	if err := db.Put(codeKey(hash), code); err != nil {
 		log.Crit("Failed to store contract code", "err", err)
 	}
-	StateWCounter.Inc(1)
-	StateSizeWCounter.Inc(int64(len(code)))
+	atomic.AddUint64(&StateWCounter, 1)
+	atomic.AddUint64(&StateSizeWCounter, uint64(len(code)))
 }
 
 // DeleteCode deletes the specified contract code from the database.
@@ -90,8 +90,8 @@ func DeleteCode(db ethdb.KeyValueWriter, hash common.Hash) {
 // ReadTrieNode retrieves the trie node of the provided hash.
 func ReadTrieNode(db ethdb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(hash.Bytes())
-	StateRCounter.Inc(1)
-	StateSizeRCounter.Inc(int64(len(data)))
+	atomic.AddUint64(&StateRCounter, 1)
+	atomic.AddUint64(&StateSizeRCounter, uint64(len(data)))
 	return data
 }
 
@@ -100,8 +100,8 @@ func WriteTrieNode(db ethdb.KeyValueWriter, hash common.Hash, node []byte) {
 	if err := db.Put(hash.Bytes(), node); err != nil {
 		log.Crit("Failed to store trie node", "err", err)
 	}
-	StateWCounter.Inc(1)
-	StateSizeWCounter.Inc(int64(len(node)))
+	atomic.AddUint64(&StateWCounter, 1)
+	atomic.AddUint64(&StateSizeWCounter, uint64(len(node)))
 }
 
 // DeleteTrieNode deletes the specified trie node from the database.
