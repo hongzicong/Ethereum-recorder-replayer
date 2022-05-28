@@ -24,25 +24,39 @@ import (
 )
 
 var (
-	StateRCounter     uint64
-	StateSizeRCounter uint64
-	StateWCounter     uint64
-	StateSizeWCounter uint64
+	PreimageRCounter     uint64
+	PreimageSizeRCounter uint64
+	PreimageWCounter     uint64
+	PreimageSizeWCounter uint64
+	CodeRCounter         uint64
+	CodeSizeRCounter     uint64
+	CodeWCounter         uint64
+	CodeSizeWCounter     uint64
+	TrieRCounter         uint64
+	TrieSizeRCounter     uint64
+	TrieWCounter         uint64
+	TrieSizeWCounter     uint64
 )
 
 // ReadPreimage retrieves a single preimage of the provided hash.
 func ReadPreimage(db ethdb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(preimageKey(hash))
+	atomic.AddUint64(&PreimageRCounter, 1)
+	atomic.AddUint64(&PreimageSizeRCounter, uint64(len(data)))
 	return data
 }
 
 // WritePreimages writes the provided set of preimages to the database.
 func WritePreimages(db ethdb.KeyValueWriter, preimages map[common.Hash][]byte) {
+	totalsize := 0
 	for hash, preimage := range preimages {
 		if err := db.Put(preimageKey(hash), preimage); err != nil {
 			log.Crit("Failed to store trie preimage", "err", err)
 		}
+		totalsize += len(preimage)
 	}
+	atomic.AddUint64(&PreimageWCounter, 1)
+	atomic.AddUint64(&PreimageSizeWCounter, uint64(totalsize))
 	preimageCounter.Inc(int64(len(preimages)))
 	preimageHitCounter.Inc(int64(len(preimages)))
 }
@@ -56,6 +70,8 @@ func ReadCode(db ethdb.KeyValueReader, hash common.Hash) []byte {
 	// scheme with snapshot.
 	data, _ := db.Get(hash[:])
 	if len(data) != 0 {
+		atomic.AddUint64(&CodeRCounter, 1)
+		atomic.AddUint64(&CodeSizeRCounter, uint64(len(data)))
 		return data
 	}
 	return ReadCodeWithPrefix(db, hash)
@@ -66,8 +82,8 @@ func ReadCode(db ethdb.KeyValueReader, hash common.Hash) []byte {
 // will only check the existence with latest scheme(with prefix).
 func ReadCodeWithPrefix(db ethdb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(codeKey(hash))
-	atomic.AddUint64(&StateRCounter, 1)
-	atomic.AddUint64(&StateSizeRCounter, uint64(len(data)))
+	atomic.AddUint64(&CodeRCounter, 1)
+	atomic.AddUint64(&CodeSizeRCounter, uint64(len(data)))
 	return data
 }
 
@@ -76,8 +92,8 @@ func WriteCode(db ethdb.KeyValueWriter, hash common.Hash, code []byte) {
 	if err := db.Put(codeKey(hash), code); err != nil {
 		log.Crit("Failed to store contract code", "err", err)
 	}
-	atomic.AddUint64(&StateWCounter, 1)
-	atomic.AddUint64(&StateSizeWCounter, uint64(len(code)))
+	atomic.AddUint64(&CodeWCounter, 1)
+	atomic.AddUint64(&CodeSizeWCounter, uint64(len(code)))
 }
 
 // DeleteCode deletes the specified contract code from the database.
@@ -90,8 +106,8 @@ func DeleteCode(db ethdb.KeyValueWriter, hash common.Hash) {
 // ReadTrieNode retrieves the trie node of the provided hash.
 func ReadTrieNode(db ethdb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(hash.Bytes())
-	atomic.AddUint64(&StateRCounter, 1)
-	atomic.AddUint64(&StateSizeRCounter, uint64(len(data)))
+	atomic.AddUint64(&TrieRCounter, 1)
+	atomic.AddUint64(&TrieSizeRCounter, uint64(len(data)))
 	return data
 }
 
@@ -100,8 +116,8 @@ func WriteTrieNode(db ethdb.KeyValueWriter, hash common.Hash, node []byte) {
 	if err := db.Put(hash.Bytes(), node); err != nil {
 		log.Crit("Failed to store trie node", "err", err)
 	}
-	atomic.AddUint64(&StateWCounter, 1)
-	atomic.AddUint64(&StateSizeWCounter, uint64(len(node)))
+	atomic.AddUint64(&TrieWCounter, 1)
+	atomic.AddUint64(&TrieSizeWCounter, uint64(len(node)))
 }
 
 // DeleteTrieNode deletes the specified trie node from the database.

@@ -173,12 +173,20 @@ func ImportChain(chain *core.BlockChain, fn string) error {
 		txPerSec := float64(totalNumTx) / sec
 		lastSec = time.Now()
 		totalNumBlock, totalNumTx = 0, 0
-		fmt.Printf("report: %d %.2f blk/s, %.2f tx/s, %v readState,"+
-			" %v writeState, %v readSizeState, %v writeSizeState,"+
+		fmt.Printf("report: %d %.2f blk/s, %.2f tx/s, "+
+			"%v readCode, %v writeCode, %v readSizeCode, %v writeSizeCode,"+
+			"%v readTrie, %v writeTrie, %v readSizeTrie, %v writeSizeTrie,"+
+			"%v readPreimage, %v writePreimage, %v readSizePreimage, %v writeSizePreimage,"+
 			" %v readTxn, %v writeTxn, %v readSizeTxn, %v writeSizeTxn\n",
-			batch*importBatchSize, blkPerSec, txPerSec, atomic.LoadUint64(&rawdb.StateRCounter), atomic.LoadUint64(&rawdb.StateWCounter),
-			atomic.LoadUint64(&rawdb.StateSizeRCounter), atomic.LoadUint64(&rawdb.StateSizeWCounter), atomic.LoadUint64(&rawdb.TxnRCounter),
-			atomic.LoadUint64(&rawdb.TxnWCounter), atomic.LoadUint64(&rawdb.TxnSizeRCounter), atomic.LoadUint64(&rawdb.TxnSizeWCounter))
+			batch*importBatchSize, blkPerSec, txPerSec,
+			atomic.LoadUint64(&rawdb.CodeRCounter), atomic.LoadUint64(&rawdb.CodeWCounter),
+			atomic.LoadUint64(&rawdb.CodeSizeRCounter), atomic.LoadUint64(&rawdb.CodeSizeWCounter),
+			atomic.LoadUint64(&rawdb.TrieRCounter), atomic.LoadUint64(&rawdb.TrieWCounter),
+			atomic.LoadUint64(&rawdb.TrieSizeRCounter), atomic.LoadUint64(&rawdb.TrieSizeWCounter),
+			atomic.LoadUint64(&rawdb.PreimageRCounter), atomic.LoadUint64(&rawdb.PreimageWCounter),
+			atomic.LoadUint64(&rawdb.PreimageSizeRCounter), atomic.LoadUint64(&rawdb.PreimageSizeWCounter),
+			atomic.LoadUint64(&rawdb.TxnRCounter), atomic.LoadUint64(&rawdb.TxnWCounter),
+			atomic.LoadUint64(&rawdb.TxnSizeRCounter), atomic.LoadUint64(&rawdb.TxnSizeWCounter))
 
 		// Load a batch of RLP blocks.
 		if checkInterrupt() {
