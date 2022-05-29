@@ -174,10 +174,10 @@ func ImportChain(chain *core.BlockChain, fn string) error {
 		lastSec = time.Now()
 		totalNumBlock, totalNumTx = 0, 0
 		fmt.Printf("report: %d %.2f blk/s, %.2f tx/s, "+
-			"%v readCode, %v writeCode, %v readSizeCode, %v writeSizeCode,"+
-			"%v readTrie, %v writeTrie, %v readSizeTrie, %v writeSizeTrie,"+
-			"%v readPreimage, %v writePreimage, %v readSizePreimage, %v writeSizePreimage,"+
-			" %v readTxn, %v writeTxn, %v readSizeTxn, %v writeSizeTxn\n",
+			"%v readCode, %v writeCode, %v readSizeCode, %v writeSizeCode, "+
+			"%v readTrie, %v writeTrie, %v readSizeTrie, %v writeSizeTrie, "+
+			"%v readPreimage, %v writePreimage, %v readSizePreimage, %v writeSizePreimage, "+
+			"%v readTxn, %v writeTxn, %v readSizeTxn, %v writeSizeTxn\n",
 			batch*importBatchSize, blkPerSec, txPerSec,
 			atomic.LoadUint64(&rawdb.CodeRCounter), atomic.LoadUint64(&rawdb.CodeWCounter),
 			atomic.LoadUint64(&rawdb.CodeSizeRCounter), atomic.LoadUint64(&rawdb.CodeSizeWCounter),
