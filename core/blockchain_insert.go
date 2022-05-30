@@ -17,6 +17,9 @@
 package core
 
 import (
+	"fmt"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -72,6 +75,19 @@ func (st *insertStats) report(chain []*types.Block, index int, dirty common.Stor
 			context = append(context, []interface{}{"ignored", st.ignored}...)
 		}
 		log.Info("Imported new chain segment", context...)
+
+		fmt.Printf("%v readCode, %v writeCode, %v readSizeCode, %v writeSizeCode, "+
+			"%v readTrie, %v writeTrie, %v readSizeTrie, %v writeSizeTrie, "+
+			"%v readPreimage, %v writePreimage, %v readSizePreimage, %v writeSizePreimage, "+
+			"%v readTxn, %v writeTxn, %v readSizeTxn, %v writeSizeTxn\n",
+			atomic.LoadUint64(&rawdb.CodeRCounter), atomic.LoadUint64(&rawdb.CodeWCounter),
+			atomic.LoadUint64(&rawdb.CodeSizeRCounter), atomic.LoadUint64(&rawdb.CodeSizeWCounter),
+			atomic.LoadUint64(&rawdb.TrieRCounter), atomic.LoadUint64(&rawdb.TrieWCounter),
+			atomic.LoadUint64(&rawdb.TrieSizeRCounter), atomic.LoadUint64(&rawdb.TrieSizeWCounter),
+			atomic.LoadUint64(&rawdb.PreimageRCounter), atomic.LoadUint64(&rawdb.PreimageWCounter),
+			atomic.LoadUint64(&rawdb.PreimageSizeRCounter), atomic.LoadUint64(&rawdb.PreimageSizeWCounter),
+			atomic.LoadUint64(&rawdb.TxnRCounter), atomic.LoadUint64(&rawdb.TxnWCounter),
+			atomic.LoadUint64(&rawdb.TxnSizeRCounter), atomic.LoadUint64(&rawdb.TxnSizeWCounter))
 
 		// Bump the stats reported to the next section
 		*st = insertStats{startTime: now, lastIndex: index + 1}
