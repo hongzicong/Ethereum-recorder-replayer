@@ -76,10 +76,12 @@ func (st *insertStats) report(chain []*types.Block, index int, dirty common.Stor
 		}
 		log.Info("Imported new chain segment", context...)
 
-		fmt.Printf("%v readCode, %v writeCode, %v readSizeCode, %v writeSizeCode, "+
+		fmt.Printf("report: %d "+
+			"%v readCode, %v writeCode, %v readSizeCode, %v writeSizeCode, "+
 			"%v readTrie, %v writeTrie, %v readSizeTrie, %v writeSizeTrie, "+
 			"%v readPreimage, %v writePreimage, %v readSizePreimage, %v writeSizePreimage, "+
 			"%v readTxn, %v writeTxn, %v readSizeTxn, %v writeSizeTxn\n",
+			end.Number().Int64(),
 			atomic.LoadUint64(&rawdb.CodeRCounter), atomic.LoadUint64(&rawdb.CodeWCounter),
 			atomic.LoadUint64(&rawdb.CodeSizeRCounter), atomic.LoadUint64(&rawdb.CodeSizeWCounter),
 			atomic.LoadUint64(&rawdb.TrieRCounter), atomic.LoadUint64(&rawdb.TrieWCounter),
